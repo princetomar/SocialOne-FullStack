@@ -26,6 +26,12 @@ const appTypeDefs = `
         user: User!
         username: String!
         createdAt: String!
+        taggedUsers: [User]
+    }
+
+    input TagUserInput {
+        _id: ID!
+        username: String!
     }
 
     input TextPostInput {
@@ -40,6 +46,7 @@ const appTypeDefs = `
         type: String!
         userId: ID!
         username: String!
+        taggedUsers: [TagUserInput]
     }
 
     type ImagePost {

@@ -5,7 +5,10 @@ module.exports = {
   Query: {
     getPosts: async () => {
       try {
-        const allPosts = await Post.find().sort({ createdAt: -1 });
+        const allPosts = await Post.find()
+          .sort({ createdAt: -1 })
+          .populate("user")
+          .populate("taggedUsers");
         console.log("All posts:", allPosts);
         return allPosts;
       } catch (err) {
@@ -27,7 +30,7 @@ module.exports = {
 
     getSinglePost: async (_, { postId }) => {
       try {
-        const post = await Post.findById(postId);
+        const post = await Post.findById(postId).populate("user");
         if (!post) {
           throw new Error("Post not found");
         } else {
@@ -69,31 +72,78 @@ module.exports = {
       }
     },
     // 2. POST A IMAGE
+
+    // createImagePost: async (_, { input }, context) => {
+    //   try {
+    //     // Check if the user exists
+    //     const user = await User.findById(input.userId);
+
+    //     if (!user) {
+    //       console.error("Error: User not found!");
+    //     }
+
+    //     // Create a new image post
+    //     const newPost = new Post({
+    //       type: input.type,
+    //       body: input.image,
+    //       user: user._id,
+    //       username: user.username,
+    //       createdAt: new Date().toISOString(),
+    //     });
+
+    //     const savedPost = await newPost.save();
+
+    //     return savedPost;
+    //   } catch (error) {
+    //     console.error("Error creating image post: ", error);
+    //   }
+    // },
+
     createImagePost: async (_, { input }, context) => {
       try {
         // Check if the user exists
         const user = await User.findById(input.userId);
-
         if (!user) {
-          console.error("Error: User not found!");
+          throw new Error("User not found!");
         }
+
+        // Get the tagged users
+        const taggedUsers = input.taggedUsers || [];
+
+        if (taggedUsers.length > 5) {
+          throw new Error("Maximum of 5 users can be tagged!");
+        }
+
+        // Extract user IDs from the taggedUsers input
+        const taggedUserIds = taggedUsers.map((taggedUser) => taggedUser._id);
 
         // Create a new image post
         const newPost = new Post({
           type: input.type,
           body: input.image,
-          user: user._id,
-          username: user.username,
+          user: input.userId,
+          username: input.username,
           createdAt: new Date().toISOString(),
+          taggedUsers: taggedUserIds, // Save the array of user IDs
         });
-
         const savedPost = await newPost.save();
 
-        return savedPost;
+        // Populate the tagged users
+        const savedTaggedUsers = await User.find({
+          _id: { $in: taggedUserIds },
+        });
+
+        // Return the saved post with populated tagged users
+        return {
+          ...savedPost._doc,
+          taggedUsers: savedTaggedUsers,
+        };
       } catch (error) {
         console.error("Error creating image post: ", error);
+        throw new Error("Failed to create image post. Please try again.");
       }
     },
+
     // 3. DELETE IMAGE POST
     deletePost: async (_, { postId, userId }) => {
       try {

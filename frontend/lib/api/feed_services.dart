@@ -8,19 +8,24 @@ import '../screens/main_home_Screen.dart';
 
 class FeedServices {
   static const String getFeedPosts = '''
-          query GetPosts {
-          getPosts {
-            body
-            createdAt
-            type
-            _id
-            user {
-              _id
-            }
-            username
-          } 
-        }
-        ''';
+  query Query {
+    getPosts {
+      _id
+      body
+      createdAt
+      taggedUsers {
+        _id
+        username
+      }
+      type
+      user {
+        username
+        _id
+        email
+      }
+    }
+  }
+''';
 
   static const String createImagePostMutation = '''
         mutation CreateImagePost(\$input: ImagePostInput!) {
@@ -52,6 +57,7 @@ class FeedServices {
     );
 
     final graphql.QueryResult result = await client.query(options);
+    print(result.data);
     return result;
   }
 
