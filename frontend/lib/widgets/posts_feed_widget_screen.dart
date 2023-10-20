@@ -205,33 +205,11 @@ class FeedWidget extends StatelessWidget {
                             const SizedBox(
                               height: 10,
                             ),
-
                             InstagramPostWidget(
                               username: post.user!.username!,
                               postImageUrl: post.body!,
                               taggedUsernames: post.taggedUsers ?? [],
                             ),
-                            // Stack(
-                            //   children: [
-                            //     Container(
-                            //       height: 200,
-                            //       width: size.width,
-                            //       child: Image.network(
-                            //         post.body!,
-                            //         fit: BoxFit.contain,
-                            //         errorBuilder: (BuildContext context,
-                            //             Object exception,
-                            //             StackTrace? stackTrace) {
-                            //           return const Icon(Icons.error);
-                            //         },
-                            //       ),
-                            //     ),
-                            //     if (post.taggedUsers != null &&
-                            //         post.taggedUsers!.isNotEmpty)
-                            //       ..._buildTaggedUsernamesWidgets(
-                            //           post.taggedUsers!),
-                            //   ],
-                            // ),
                           ],
                         ),
                       );
@@ -303,17 +281,19 @@ class _InstagramPostWidgetState extends State<InstagramPostWidget> {
         child: InkWell(
           onTap: () {
             print("Tapped on username: ${user.username}");
+            NavigationConstants.nextScreen(
+                context, SelectedUserProfileScreen(username: user.username!));
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.black,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               user.username ?? 'No Username',
               style: const TextStyle(
-                color: Colors.black,
+                color: ColorConstants.yelloColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -325,86 +305,3 @@ class _InstagramPostWidgetState extends State<InstagramPostWidget> {
     return widgets;
   }
 }
-
-
-// class InstagramPostWidget extends StatelessWidget {
-//   final String username;
-//   final String postImageUrl;
-//   final List<User>? taggedUsernames;
-
-//   InstagramPostWidget({
-//     required this.username,
-//     required this.postImageUrl,
-//     this.taggedUsernames,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     bool showTaggedUser = false;
-//     return Stack(
-//       children: [
-//         InkWell(
-//           onTap: () {
-//             if (taggedUsernames != null && taggedUsernames!.isNotEmpty) {
-//               _showTaggedUsernames(taggedUsernames!);
-//             } else {
-//               print("No tagged usernames found");
-//             }
-//           },
-//           child: Image.network(
-//             postImageUrl,
-//             fit: BoxFit.cover,
-//             width: double.infinity,
-//             height: 200, // Adjust the height as needed
-//           ),
-//         ),
-//         if (taggedUsernames != null && taggedUsernames!.isNotEmpty)
-//           ..._buildTaggedUsernamesWidgets(taggedUsernames!),
-//       ],
-//     );
-//   }
-
-//   void _showTaggedUsernames(List<User> usernames) {
-//     for (var user in usernames) {
-//       print(user.username);
-//     }
-//   }
-
-//   List<Widget> _buildTaggedUsernamesWidgets(List<User> users) {
-//     final List<Widget> widgets = [];
-//     final random = Random();
-
-//     for (var user in users) {
-//       final position = Offset(
-//         random.nextDouble() * 200, // Adjust the position range as needed
-//         random.nextDouble() * 250, // Adjust the position range as needed
-//       );
-
-//       final taggedUsernameWidget = Positioned(
-//         left: position.dx,
-//         top: position.dy,
-//         child: InkWell(
-//           onTap: () {
-//             print("Tapped on username: ${user.username}");
-//           },
-//           child: Container(
-//             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-//             decoration: BoxDecoration(
-//               color: Colors.white,
-//               borderRadius: BorderRadius.circular(8),
-//             ),
-//             child: Text(
-//               user.username ?? 'No Username',
-//               style: const TextStyle(
-//                 color: Colors.black,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//           ),
-//         ),
-//       );
-//       widgets.add(taggedUsernameWidget);
-//     }
-//     return widgets;
-//   }
-// }
